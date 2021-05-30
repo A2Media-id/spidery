@@ -11,8 +11,8 @@ class TestSimple(unittest.TestCase):
 
     def test(self):
         with ProxyGrabber() as sp:
-            print(sp.scripts.keys())
-            self.assertTrue(isinstance(sp.scripts,dict))
+            proxies = sp.search(limit=100,workers=3)
+            self.assertTrue(len(proxies) >= 100)
 
 
 if __name__ == '__main__':

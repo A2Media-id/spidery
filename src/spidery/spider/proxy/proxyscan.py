@@ -15,7 +15,7 @@ class Engine(ProxyEngine):
         super(Engine, self).__init__(**kwargs)
 
     def _fetch_url(self, url, **kwargs):
-        flag=None
+        flag = None
         try:
             headers = {
                 'Connection': 'keep-alive',
@@ -40,15 +40,14 @@ class Engine(ProxyEngine):
                 'sortTime': 'true',
                 'sortUptime': 'true'
             }
-            response = self.post(f'{url}/Home/FilterResult', headers=headers,data=data)
+            response = self.post(f'{url}/Home/FilterResult', headers=headers, data=data)
             if response and response.ok:
                 response.encoding = 'utf-8'
-                flag = re.sub("</th><td>", ":", re.sub(r"\s{2,}","",response.text), 0, re.IGNORECASE | re.MULTILINE)
+                flag = re.sub("</th><td>", ":", re.sub(r"\s{2,}", "", response.text), 0, re.IGNORECASE | re.MULTILINE)
         except requests.ConnectionError:
             pass
         finally:
             return str(flag)
-
 
 
 if __name__ == '__main__':

@@ -326,29 +326,31 @@ class ProxyGrabber(object):
         if exc_type is not None:
             traceback.print_exception(exc_type, exc_value, tb)
 
-    def search(self, validate=None):
+    def search(self, limit=None, workers=2):
         result = []
-        executor = ThreadPoolExecutor(max_workers=5)
-        if self._sources:
-            # noinspection PyUnresolvedReferences
-            all_task = [executor.submit(source.search, ) for s, source in self._sources.items()]
-            for task in as_completed(all_task):
-                for _ in task.result():
-                    if _ not in result:
-                        result.append(_)
-        if validate:
-            validated = []
+        with ThreadPoolExecutor(max_workers=workers) as executor:
             try:
-                validate = [executor.submit(self.check_proxy, p) for p in result]
-                for task in as_completed(validate):
-                    success, x = task.result()
-                    if success:
-                        validated.append(x)
+                all_task = [executor.submit(source.search, ) for s, source in self._sources.items()]
+                for task in as_completed(all_task):
+                    try:
+                        for proxy in task.result():
+                            if proxy and proxy not in result:
+                                result.append(proxy)
+                        if limit and len(result) >= int(limit):
+                            for t in all_task:
+                                t.cancel()
+                            return result
+                    except TypeError:
+                        continue
+            except (KeyboardInterrupt, SystemExit):
+                raise
             except Exception as error:
                 logging.exception(
                     ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
             finally:
-                result = validated
+
+                executor.shutdown(wait=False)
+
         return result
 
     @property
