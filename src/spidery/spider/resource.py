@@ -7,7 +7,7 @@ import os
 import re
 import traceback
 
-from constants import REGEX_CLEANER
+from .constants import REGEX_CLEANER
 from spidery.utils.func import pad
 from spidery.utils.jetpack import Photon
 

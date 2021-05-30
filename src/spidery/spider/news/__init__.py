@@ -6,9 +6,11 @@ import traceback
 from abc import abstractmethod, ABC
 from typing import List
 
-from .spider import BaseCrawl
-from .spider.resource import DataNews, DataArticle
+
 from bs4 import BeautifulSoup
+
+from spidery.spider.engine import BaseCrawl
+from spidery.spider.resource import DataNews, DataArticle
 
 
 class NewsEngine(BaseCrawl, ABC):

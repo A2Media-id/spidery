@@ -4,13 +4,14 @@
 
 import unittest
 
-from spidery.spider.engine import BaseCrawl
+from spidery.spider.engine import Spider
 
 
 class TestSimple(unittest.TestCase):
 
-    def test_add_one(self):
-        self.assertTrue(isinstance(BaseCrawl(),BaseCrawl))
+    def test(self):
+        with Spider() as sp:
+            self.assertTrue(isinstance(sp.engines,dict))
 
 
 if __name__ == '__main__':
