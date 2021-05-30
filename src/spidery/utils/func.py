@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import re
+import tempfile
 import traceback
 from string import ascii_lowercase
 from typing import List
@@ -73,7 +74,6 @@ def make_safe_filename(s):
 
 
 def get_tempfile_name(some_id):
-    # noinspection PyUnresolvedReferences
     return os.path.join(tempfile.gettempdir(), next(tempfile._get_candidate_names()) + "_" + some_id)
 
 
