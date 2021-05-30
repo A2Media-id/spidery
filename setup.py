@@ -171,7 +171,6 @@ setup(
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
     data_files=[
         ('data', []),
-        ('requirements.txt', ['requirements.txt']),
     ],  # Optional
 
     # To provide executable scripts, use entry points in preference to the
