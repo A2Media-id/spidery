@@ -143,7 +143,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=open('requirements.txt',mode='r').readlines(),  # Optional
+    install_requires=(here / 'requirements.txt').read_text(encoding='utf-8').splitlines(),  # Optional
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
@@ -169,7 +169,10 @@ setup(
     # http://docs.python.org/distutils/setupscript.html#installing-additional-files
     #
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
-    data_files=[('data', [])],  # Optional
+    data_files=[
+        ('data', []),
+        ('requirements.txt', ['requirements.txt']),
+    ],  # Optional
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
