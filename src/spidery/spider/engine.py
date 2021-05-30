@@ -25,7 +25,7 @@ from .resource import ProxyData
 from spidery.utils.func import strip_html
 from ..ua.agent import Agent
 
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)  # noqa
 
 
 class BaseCrawl(object):
@@ -241,6 +241,7 @@ class Spider(object):
         finally:
             return result
 
+
 class ProxyEngine(BaseCrawl):
     urls = []
 
@@ -304,7 +305,6 @@ class ProxyEngine(BaseCrawl):
                     logging.exception(
                         ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
         logging.info(f'fetching complete')
-
 
 
 class Proxy(object):

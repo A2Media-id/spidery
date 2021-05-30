@@ -7,7 +7,7 @@ import os
 import re
 import traceback
 
-from .constants import REGEX_CLEANER
+from constants import REGEX_CLEANER
 from spidery.utils.func import pad
 from spidery.utils.jetpack import Photon
 
@@ -146,7 +146,7 @@ class DataImage(BaseData):
         return Photon(self.url, **kwargs).url.strip()
 
     def save_to_file(self, output_file: str, overwrite=False):
-        from .spider import BaseCrawl
+        from spidery.spider.engine import BaseCrawl
 
         flag = None
         try:
@@ -209,6 +209,7 @@ class DataSnipet(BaseData):
                 self=self
             )
         )
+
 
 class ProxyData(object):
     def __init__(self, **kwargs):
