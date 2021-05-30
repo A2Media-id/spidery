@@ -69,7 +69,12 @@ class BaseCrawl(object):
                 headers.update([(h, extra_headers[h])])
         proxies = None
         if self.proxies:
-            proxies = self.proxies.get_format if hasattr(self.proxies, 'get_format') else self.proxies
+            if hasattr(self.proxies, 'get_format'):
+                proxies = self.proxies.get_format
+            elif hasattr(self.proxies, 'format'):
+                proxies = self.proxies.format
+            else:
+                proxies = str(self.proxies)
         response = self.session.request(method, url, params=params, data=data, timeout=timeout, verify=False,
                                         headers=headers, files=files, proxies=proxies, allow_redirects=True)
         response.raise_for_status()
