@@ -1,37 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import logging
+import re
 import traceback
 
-from pyquery import PyQuery
-
 from spidery.spider.engine import ProxyEngine
+from spidery.spider.resource import ProxyData
 
 
 class Engine(ProxyEngine):
     _me = __file__
-    urls = ['https://free-proxy-list.net']
+    urls = ['http://api.foxtools.ru/v2/Proxy.txt']
 
     def __init__(self, **kwargs):
         super(Engine, self).__init__(**kwargs)
 
     def _parse_raw(self, html):
         try:
-            doc = PyQuery(html)
-            table = doc.find('table#proxylisttable')
-            tbody = table.find('tbody')
-            for html_tr in tbody.items('tr'):
+            march_group = re.findall(r"((?:\d{1,3}\.){3}\d{1,3}):(\d{2,5})", str(html), re.IGNORECASE)
+            for group in march_group:
                 try:
-                    host, port, country_code, country_name, anonymity, support_google, support_https, last_check = [
-                        i.text()
-                        for i in
-                        html_tr.items(
-                            'td')]
+                    host, port = group
                     yield ProxyData(**{
                         'host': host,
                         'port': port,
-                        'country': country_code,
-                        'type': 'https' if str(support_https).lower() != 'no' else 'http',
+                        'type': 'https' if str(port) == '8080' else 'http',
                     })
                 except Exception as error:
                     logging.exception(

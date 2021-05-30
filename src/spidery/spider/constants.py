@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+REGEX_PROXY = r"((?:\d{1,3}\.){3}\d{1,3})[\t|\s|\:](\d{2,5})"
+REGEX_PROXY_ONE = r"((?:\d{1,3}\.){3}\d{1,3}):(\d{2,5})"
 REGEX_CLEANER = {
     'common': [r"\s?(\[[^\]]+\]|\([^\)]+\)|\.{3,}|\:{2,}|\,{2,}|\s{2,})\s?", " "],
     'common_posted': [

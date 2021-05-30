@@ -17,7 +17,7 @@ class Engine(ProxyEngine):
 
     def _parse_raw(self, html):
         try:
-            march_group = re.findall(r"((?:\d{1,3}\.){3}\d{1,3}):(\d{2,4})\s([A-Z]{2})", str(html), re.IGNORECASE)
+            march_group = re.findall(r"((?:\d{1,3}\.){3}\d{1,3}):(\d{2,5})\s([A-Z]{2})", str(html), re.IGNORECASE)
             for group in march_group:
                 try:
                     host, port, country_code = group

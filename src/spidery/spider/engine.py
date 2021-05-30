@@ -20,7 +20,7 @@ from requests.structures import CaseInsensitiveDict
 from urllib3.exceptions import InsecureRequestWarning
 
 # noinspection PyUnresolvedReferences
-from .constants import BLACKLIST_DOMAIN
+from .constants import BLACKLIST_DOMAIN, REGEX_PROXY
 from .resource import ProxyData
 from spidery.utils.func import strip_html
 from ..ua.agent import Agent
@@ -271,7 +271,7 @@ class ProxyEngine(BaseCrawl):
 
     def _parse_raw(self, html):
         try:
-            march_group = re.findall(r"((?:\d{1,3}\.){3}\d{1,3})[\t|\s|\:](\d{2,5})", strip_html(html), re.IGNORECASE)
+            march_group = re.findall(REGEX_PROXY, strip_html(html), re.IGNORECASE)
             for group in march_group:
                 try:
                     host, port = group

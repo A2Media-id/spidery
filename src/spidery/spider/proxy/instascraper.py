@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 from spidery.spider.engine import ProxyEngine
+
 
 class Engine(ProxyEngine):
     _me = __file__

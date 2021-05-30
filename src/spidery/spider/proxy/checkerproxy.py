@@ -35,7 +35,6 @@ class Engine(ProxyEngine):
                 proxies = self._get_json(f'https://checkerproxy.net/api/{archive}', headers=headers)
                 if proxies:
                     for _, proxy in enumerate(proxies):
-
                         try:
                             host, port = pad(str(proxy.get('addr')).split(':'), 2, None)
                             if not host:

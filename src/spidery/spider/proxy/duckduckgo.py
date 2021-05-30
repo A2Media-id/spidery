@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import ipaddress
 import logging
 import random
 import traceback
@@ -20,10 +19,14 @@ class Engine(ProxyEngine):
         "free http proxy list",
         "ssl proxy pastebin",
         "ssl proxy list",
+        "proxy api free",
+        "IP Port Anonymity 3128",
         "free https proxies",
         "free https proxy list",
         "https proxies",
         "https proxy list",
+        "proxy rotator free",
+        "proxy rotator :3128",
         "proxies list",
         "USA https proxy",
         "proxy scrape",
@@ -45,39 +48,39 @@ class Engine(ProxyEngine):
 
     @property
     def keywords(self):
-        return random.sample(self._keywords, k=5)
+        # return random.sample(self._keywords, k=3)
+        return random.choice(self._keywords)
 
+    @property
     def search(self):
         processed = []
         result = []
-        for keyword in self.keywords:
-            logging.info(f'[!]Dorking for keyword {keyword}')
-            # if len(result) >= 1000:
-            #     break
-            with Duck() as duck:
-                snipets = duck.search(keyword)
-                for snipet in snipets:
-                    if snipet.link in processed:
-                        continue
-                    logging.info(f'fetching {snipet.link}')
-                    html = self._fetch_url(snipet.link)
-                    parsed = self._parse_raw(strip_html(html))
-                    if parsed:
-                        for _ in parsed:
-                            try:
-                                if not ipaddress.IPv4Address(_.host).is_private and _.host not in result:
-                                    result.append(_)
-                                    yield _
-                            except ValueError:
-                                continue
-                            except Exception as error:
-                                logging.exception(''.join(
-                                    traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
-                    processed.append(snipet.link)
+        keyword = self.keywords
+        logging.info(f'[!]Dorking for keyword {keyword}')
+        with Duck() as duck:
+            snipets = duck.search(keyword)
+            for snipet in snipets:
+                if snipet.link in processed:
+                    continue
+                logging.info(f'fetching {snipet.link}')
+                html = self._fetch_url(snipet.link)
+                parsed = self._parse_raw(strip_html(html))
+                if parsed:
+                    for _ in parsed:
+                        try:
+                            if _.host not in result:
+                                result.append(_)
+                                yield _
+                        except ValueError:
+                            continue
+                        except Exception as error:
+                            logging.exception(''.join(
+                                traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
+                processed.append(snipet.link)
         logging.info(f'fetching complete')
 
 
 if __name__ == '__main__':
     eng = Engine()
-    for proxy in eng.search():
+    for proxy in eng.search:
         print(proxy)
