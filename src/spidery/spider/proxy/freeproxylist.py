@@ -6,6 +6,7 @@ import traceback
 from pyquery import PyQuery
 
 from spidery.spider.engine import ProxyEngine
+from spidery.spider.resource import ProxyData
 
 
 class Engine(ProxyEngine):

@@ -8,6 +8,7 @@ import os
 import pickle
 import re
 import traceback
+from concurrent.futures import as_completed, ThreadPoolExecutor
 from typing import Dict
 from urllib.parse import urlparse
 
@@ -20,10 +21,10 @@ from requests.structures import CaseInsensitiveDict
 from urllib3.exceptions import InsecureRequestWarning
 
 # noinspection PyUnresolvedReferences
-from .constants import BLACKLIST_DOMAIN, REGEX_PROXY
-from .resource import ProxyData
+from spidery.spider.constants import BLACKLIST_DOMAIN, REGEX_PROXY
+from spidery.spider.resource import ProxyData
+from spidery.ua.agent import Agent
 from spidery.utils.func import strip_html
-from ..ua.agent import Agent
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)  # noqa
 
@@ -307,35 +308,100 @@ class ProxyEngine(BaseCrawl):
         logging.info(f'fetching complete')
 
 
-class Proxy(object):
-    def __init__(self, **kwargs):
-        self.host = kwargs.get('host')
-        self.port = kwargs.get('port')
-        self.type = kwargs.get('type', 'http').upper()
-        self.country = str(kwargs.get('country')).upper() if kwargs.get('country') else None
-        self.status = kwargs.get('status')
-        self.last_check = kwargs.get('last_check')
-        self.last_use = kwargs.get('last_use')
+class ProxyGrabber(object):
+    _sources: Dict[str, ProxyEngine] = {}
 
-    def __str__(self):
-        return '{self.host}:{self.port}'.format(self=self)
+    def __init__(self):
+        self._load_modules()
 
-    def __repr__(self):
-        return (
-            '<{class_name}('
-            'host="{self.host}")>'.format(
-                class_name=self.__class__.__name__,
-                self=self
-            )
-        )
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, tb):
+        if exc_type is not None:
+            traceback.print_exception(exc_type, exc_value, tb)
+
+    def search(self, validate=None):
+        result = []
+        executor = ThreadPoolExecutor(max_workers=5)
+        if self._sources:
+            # noinspection PyUnresolvedReferences
+            all_task = [executor.submit(source.search, ) for s, source in self._sources.items()]
+            for task in as_completed(all_task):
+                for _ in task.result():
+                    if _ not in result:
+                        result.append(_)
+        if validate:
+            validated = []
+            try:
+                validate = [executor.submit(self.check_proxy, p) for p in result]
+                for task in as_completed(validate):
+                    success, x = task.result()
+                    if success:
+                        validated.append(x)
+            except Exception as error:
+                logging.exception(
+                    ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
+            finally:
+                result = validated
+        return result
 
     @property
-    def url(self):
-        return str(f"{self.type.lower().rstrip('s')}://{self.host}:{self.port}").lower()
+    def scripts(self):
+        return self._sources
 
-    @property
-    def format(self):
-        return {
-            "http": str(f"{self.type.lower().rstrip('s')}://{self.host}:{self.port}").lower(),
-            "https": str(f"{self.type.lower().rstrip('s')}://{self.host}:{self.port}").lower(),
-        }
+    @staticmethod
+    def check_proxy(proxy, **kwargs):
+        flag = False
+        default_type = proxy.type
+        try:
+            proxy_types = [
+                'https',
+                'socks4',
+                'socks5',
+            ]
+            for typed in proxy_types:
+                try:
+                    proxy.type = typed
+                    with BaseCrawl(proxies=proxy, **kwargs) as http:
+                        req = http.get(url='https://get.geojs.io/v1/ip/geo.json', timeout=8)
+                        data = req.json() if req and (req.json() and proxy.host in req.text) else None
+                        if data:
+                            data.update(proxy_type=proxy.type.upper())
+                            flag = data
+                            break
+                except ValueError:
+                    pass
+                except Exception as error:
+                    logging.error(error)
+        except Exception as error:
+            logging.exception(
+                ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
+        finally:
+            if not flag:
+                proxy.type = default_type.upper()
+            return flag
+
+    def _load_modules(self):
+        try:
+            path_scripts = os.path.join(os.path.dirname(os.path.abspath(__file__)), "proxy")
+            errors = []
+            for sc in glob.glob('{}/*.py'.format(path_scripts)):
+                if os.path.isfile(sc) and sc.endswith(".py") and not sc.endswith("__init__.py"):
+                    sc_module = os.path.realpath(sc)
+                    sc_module = sc_module[sc_module.find('spidery'):]
+                    try:
+                        sc_mod = sc_module.replace(os.path.sep, os.path.extsep)[:-3]
+                        module = importlib.import_module(sc_mod)
+                        if hasattr(module, 'Engine'):
+                            mod = module.Engine()
+                            self._sources.update({mod.me(): mod})
+                    except Exception as error:
+                        print(
+                            ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
+                        errors.append(sc_module)
+                        logging.info(f'Failed loading script {sc_module} : {error}')
+            if errors:
+                raise KeyboardInterrupt('Cancelled.')
+        except Exception as error:
+            logging.info(f'Failed loading scripts : {error}')

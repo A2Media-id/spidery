@@ -4,14 +4,15 @@
 
 import unittest
 
-from spidery.spider.engine import Spider
+from spidery.spider.engine import ProxyGrabber
 
 
 class TestSimple(unittest.TestCase):
 
     def test(self):
-        with Spider() as sp:
-            self.assertTrue(isinstance(sp.engines,dict))
+        with ProxyGrabber() as sp:
+            print(sp.scripts.keys())
+            self.assertTrue(isinstance(sp.scripts,dict))
 
 
 if __name__ == '__main__':
