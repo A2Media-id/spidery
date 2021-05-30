@@ -7,7 +7,7 @@ import random
 import re
 import traceback
 
-from .device_type import DeviceType
+from device_type import DeviceType
 from spidery.utils.func import write_file, cap_sentence, num_to_alpha
 
 UA_BIN = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ua.bin')
