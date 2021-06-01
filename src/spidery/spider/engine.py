@@ -7,6 +7,7 @@ import logging
 import os
 import pickle
 import re
+import sys
 import traceback
 from concurrent.futures import as_completed, ThreadPoolExecutor
 from typing import Dict
@@ -27,6 +28,15 @@ from spidery.ua.agent import Agent
 from spidery.utils.func import strip_html
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)  # noqa
+if not hasattr(sys, 'getwindowsversion'):
+    try:
+        import resource
+
+        soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        resource.setrlimit(resource.RLIMIT_NOFILE, (hard, hard))
+    except Exception as error:
+        logging.exception(
+            ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
 
 
 class BaseCrawl(object):
