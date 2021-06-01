@@ -163,7 +163,7 @@ setup(
     package_data={  # Optional
         'spidery': [],
         'spidery.ua': ['*.bin', ],
-        'spidery.spider': ['*.bin', ],
+        'spidery.spider.osint': ['*.bin', ],
     },
     include_package_data=True,
 
