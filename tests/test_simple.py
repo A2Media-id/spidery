@@ -10,9 +10,9 @@ from spidery.spider.engine import ProxyGrabber
 class TestSimple(unittest.TestCase):
 
     def test(self):
-        with ProxyGrabber() as sp:
-            proxies = sp.search(limit=100,workers=3)
-            self.assertTrue(len(proxies) >= 100)
+        mods=ProxyGrabber().scripts.keys()
+        print(mods)
+        self.assertTrue(len(mods) > 0)
 
 
 if __name__ == '__main__':
