@@ -406,7 +406,7 @@ class ProxyGrabber(object):
             for sc in glob.glob('{}/*.py'.format(path_scripts)):
                 if os.path.isfile(sc) and sc.endswith(".py") and not sc.endswith("__init__.py"):
                     sc_module = os.path.realpath(sc)
-                    sc_module = sc_module[sc_module.find('spidery'):]
+                    sc_module = sc_module[sc_module.rfind('spidery'):]
                     try:
                         sc_mod = sc_module.replace(os.path.sep, os.path.extsep)[:-3]
                         module = importlib.import_module(sc_mod)
