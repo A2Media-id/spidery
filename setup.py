@@ -162,7 +162,8 @@ setup(
     # # installed, specify them here.
     package_data={  # Optional
         'spidery': [],
-        'spidery.ua': ['*.bin',],
+        'spidery.ua': ['*.bin', ],
+        'spidery.spider': ['*.bin', ],
     },
     include_package_data=True,
 
