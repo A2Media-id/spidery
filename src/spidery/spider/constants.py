@@ -51,7 +51,7 @@ BLACKLIST_DOMAIN = [
     "reviews",
     "serverfault.",
     ".facebook.",
-    ".youtube.",
+    # ".youtube.",
     ".gsa-online.",
     "/(blog|kb|wiki|helps|help|docs|doc)/",
     "wiki.",
