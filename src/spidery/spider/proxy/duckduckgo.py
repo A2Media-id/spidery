@@ -76,8 +76,6 @@ class Engine(ProxyEngine):
     def _parse_raw(self, html):
         try:
             soup = bs4.BeautifulSoup(html, "html.parser")
-            print(soup.prettify())
-
             archives = soup.find_all('a', class_='result__url')
             for i, a in enumerate(archives):
                 try:
