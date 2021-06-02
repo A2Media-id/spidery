@@ -2,16 +2,22 @@
 # -*- coding: utf-8 -*-
 import logging
 import random
+import re
 import traceback
+from urllib.parse import quote_plus
 
+import bs4
+import requests
+
+from spidery.spider.constants import REGEX_PROXY
 from spidery.spider.engine import ProxyEngine
-from spidery.spider.snippet.duckduckgo import Engine as Duck
+from spidery.spider.resource import ProxyData
 from spidery.utils.func import strip_html
 
 
 class Engine(ProxyEngine):
     _me = __file__
-    _keywords = [
+    keywords = [
         "proxy list",
         "proxy list :3128",
         "anonymous elite transparent 3128",
@@ -41,46 +47,62 @@ class Engine(ProxyEngine):
         "MX elite 8080 3128",
         "anonymous proxies",
     ]
-    urls = ['https://free-proxy-list.net']
 
     def __init__(self, **kwargs):
         super(Engine, self).__init__(**kwargs)
 
-    @property
-    def keywords(self):
-        # return random.sample(self._keywords, k=3)
-        return random.choice(self._keywords)
+    def _fetch_url(self, url, **kwargs):
+        flag = None
+        try:
+            response = self.get(url, params={'q': quote_plus(self.keyword)})
+            if response and response.ok:
+                response.encoding = 'utf-8'
+                flag = response.text
+        except requests.ConnectionError:
+            pass
+        finally:
+            return str(flag)
 
     @property
-    def search(self):
-        processed = []
-        result = []
-        keyword = self.keywords
-        logging.info(f'[!]Dorking for keyword {keyword}')
-        with Duck() as duck:
-            snipets = duck.search(keyword)
-            for snipet in snipets:
-                if snipet.link in processed:
-                    continue
-                logging.info(f'fetching {snipet.link}')
-                html = self._fetch_url(snipet.link)
-                parsed = self._parse_raw(strip_html(html))
-                if parsed:
-                    for _ in parsed:
-                        try:
-                            if _.host not in result:
-                                result.append(_)
-                                yield _
-                        except ValueError:
-                            continue
-                        except Exception as error:
-                            logging.exception(''.join(
-                                traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
-                processed.append(snipet.link)
-        logging.info(f'fetching complete')
+    def keyword(self):
+        # return random.sample(self._keywords, k=3)
+        return random.choice(self.keywords)
+
+    @property
+    def urls(self):
+        # return random.sample(self._keywords, k=3)
+        return [f"https://html.duckduckgo.com/html/"]
+
+    def _parse_raw(self, html):
+        try:
+            soup = bs4.BeautifulSoup(html, "html.parser")
+            print(soup.prettify())
+
+            archives = soup.find_all('a', class_='result__url')
+            for i, a in enumerate(archives):
+                try:
+                    raw = self.get(a.get('href'))
+                    if raw:
+                        march_group = re.findall(REGEX_PROXY, strip_html(raw.text), re.IGNORECASE)
+                        for group in march_group:
+                            host, port = group
+                            yield ProxyData(**{
+                                'host': host,
+                                'port': port,
+                                'country': None,
+                                'type': 'https' if str(port) == '8080' else 'http',
+                            })
+                except Exception as error:
+                    logging.exception(
+                        ''.join(
+                            traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
+
+        except Exception as error:
+            logging.exception(
+                ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
 
 
 if __name__ == '__main__':
     eng = Engine()
-    for proxy in eng.search:
+    for proxy in eng.search():
         print(proxy)
