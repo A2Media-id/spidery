@@ -7,7 +7,7 @@ class Engine(ProxyEngine):
     _me = __file__
     urls = [
         'https://kidux.net/kfp/proxies.txt',
-            ]
+    ]
 
     def __init__(self, **kwargs):
         super(Engine, self).__init__(**kwargs)

@@ -6,7 +6,6 @@ import traceback
 from abc import abstractmethod, ABC
 from typing import List
 
-
 from bs4 import BeautifulSoup
 
 from spidery.spider.engine import BaseCrawl
@@ -25,7 +24,7 @@ class NewsEngine(BaseCrawl, ABC):
         try:
             attrs = ['src', 'data-src', 'data-srcset']
             datas = soup.find_all('img') or []
-            added=set()
+            added = set()
             for i, im in enumerate(datas):
                 default_text = im.get('alt') or im.text
                 parent = im.parent
@@ -38,7 +37,8 @@ class NewsEngine(BaseCrawl, ABC):
                     ims = str(im.get(atr)).split()
                     for img in ims:
                         if re.search(r"https?://([A-Za-z_0-9.-]+)(\/[^\s]+)?", img, re.IGNORECASE) and img not in added:
-                            image = re.sub(r"(,(w_\d+|ar_\d+:\d+)|\/w\d+$)", "", str(img).strip(), 0, re.IGNORECASE | re.VERBOSE)
+                            image = re.sub(r"(,(w_\d+|ar_\d+:\d+)|\/w\d+$)", "", str(img).strip(), 0,
+                                           re.IGNORECASE | re.VERBOSE)
                             added.add(img)
                             results.append((image, text))
         except Exception as error:

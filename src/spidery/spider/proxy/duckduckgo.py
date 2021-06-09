@@ -4,7 +4,7 @@ import logging
 import random
 import re
 import traceback
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, unquote
 
 import bs4
 import requests
@@ -35,17 +35,20 @@ class Engine(ProxyEngine):
         "proxy rotator :3128",
         "proxies list",
         "USA https proxy",
-        "proxy scrape",
+        "proxy scrape list",
         "proxy sites",
         "free proxy list",
         "daily proxies",
         "instagram proxies",
         "facebook proxy list",
         "squid proxy list",
-        "google ssl proxy",
+        "google ssl proxy list",
+        "United States free proxy servers",
         "Indonesia elite 8080 3128",
         "MX elite 8080 3128",
-        "anonymous proxies",
+        "Free Anonymous 3128 Proxy",
+        "anonymous proxies list",
+        "Proxy list for country: United States",
     ]
 
     def __init__(self, **kwargs):
@@ -57,7 +60,7 @@ class Engine(ProxyEngine):
             response = self.get(url, params={'q': quote_plus(self.keyword)})
             if response and response.ok:
                 response.encoding = 'utf-8'
-                flag = response.text
+                flag = unquote(response.text)
         except requests.ConnectionError:
             pass
         finally:
@@ -65,21 +68,20 @@ class Engine(ProxyEngine):
 
     @property
     def keyword(self):
-        # return random.sample(self._keywords, k=3)
         return random.choice(self.keywords)
 
     @property
     def urls(self):
-        # return random.sample(self._keywords, k=3)
-        return [f"https://html.duckduckgo.com/html/"]
+        return [f"https://html.duckduckgo.com/html"]
 
     def _parse_raw(self, html):
         try:
             soup = bs4.BeautifulSoup(html, "html.parser")
-            archives = soup.find_all('a', class_='result__url')
+            archives = soup.find_all('a', class_='result__url', text=True)
             for i, a in enumerate(archives):
                 try:
-                    raw = self.get(a.get('href'))
+                    link = str(a.text).strip()
+                    raw = self.get(f'http://{link}')
                     if raw:
                         march_group = re.findall(REGEX_PROXY, strip_html(raw.text), re.IGNORECASE)
                         for group in march_group:

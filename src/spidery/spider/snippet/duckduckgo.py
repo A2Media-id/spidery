@@ -13,7 +13,7 @@ class Engine(BaseCrawl):
     _me = __file__
 
     def __init__(self, *args, **kwargs):
-        super(Engine, self).__init__( **kwargs)
+        super(Engine, self).__init__(**kwargs)
 
     def search(self, term: str):
         results = []

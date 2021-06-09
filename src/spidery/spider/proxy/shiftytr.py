@@ -7,7 +7,7 @@ class Engine(ProxyEngine):
     _me = __file__
     urls = [
         'https://raw.githubusercontent.com/shiftytr/proxy-list/master/proxy.txt',
-            ]
+    ]
 
     def __init__(self, **kwargs):
         super(Engine, self).__init__(**kwargs)

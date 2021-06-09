@@ -8,7 +8,7 @@ class Engine(ProxyEngine):
     urls = [
         'https://www.freeproxychecker.com/result/http_proxies.txt',
         'https://www.freeproxychecker.com/result/socks4_proxies.txt',
-            ]
+    ]
 
     def __init__(self, **kwargs):
         super(Engine, self).__init__(**kwargs)

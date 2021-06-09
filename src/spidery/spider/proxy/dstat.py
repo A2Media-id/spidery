@@ -7,7 +7,7 @@ class Engine(ProxyEngine):
     _me = __file__
     urls = [
         'https://www.dstat.cn/proxy.txt',
-            ]
+    ]
 
     def __init__(self, **kwargs):
         super(Engine, self).__init__(**kwargs)

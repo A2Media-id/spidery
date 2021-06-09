@@ -9,7 +9,7 @@ import bs4
 from spidery.spider.constants import REGEX_PROXY
 from spidery.spider.engine import ProxyEngine
 from spidery.spider.resource import ProxyData
-from spidery.utils.func import pad, strip_html
+from spidery.utils.func import strip_html
 
 
 class Engine(ProxyEngine):
@@ -23,7 +23,7 @@ class Engine(ProxyEngine):
         try:
             soup = bs4.BeautifulSoup(html, "html.parser")
             archives = soup.find_all('a', {'data-xf-init': 'preview-tooltip'})
-            for i,a in enumerate(archives):
+            for i, a in enumerate(archives):
                 try:
                     raw = self.get(f"https://cyberwog.com/{a.get('href')}")
                     march_group = re.findall(REGEX_PROXY, strip_html(raw.text), re.IGNORECASE)

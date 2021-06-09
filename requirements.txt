@@ -3,4 +3,3 @@ requests[socks]
 BeautifulSoup4
 ipaddress>=1.0.23
 lxml>=4.6.3
-pyquery >=1.4.1

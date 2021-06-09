@@ -19,7 +19,7 @@ def num_to_alpha(num):
              '9': 'nine'}
     nums = []
     nums[:0] = str(num)
-    return str(',').join(list(map(lambda x: pairs.get(x,x), nums)))
+    return str(',').join(list(map(lambda x: pairs.get(x, x), nums)))
 
 
 def strip_html(s):

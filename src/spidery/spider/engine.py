@@ -99,6 +99,7 @@ class BaseCrawl(object):
         except requests.exceptions.ProxyError:
             return None
         except requests.RequestException as error:
+            print(error)
             if self._debug:
                 logging.exception(
                     ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
@@ -313,7 +314,7 @@ class ProxyEngine(BaseCrawl):
             html = self._fetch_url(url)
             for _ in self._parse_raw(html):
                 try:
-                    if not ipaddress.IPv4Address(_.host).is_private:
+                    if _ and not ipaddress.IPv4Address(_.host).is_private:
                         yield _
                 except ValueError:
                     continue
