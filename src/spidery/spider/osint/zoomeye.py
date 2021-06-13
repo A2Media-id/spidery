@@ -37,7 +37,6 @@ class Engine(BaseCrawl):
                 for aux in auths:
                     u, p = aux
                     new_token = self.auth(u, p)
-                    print(u, new_token)
                     if new_token:
                         self.access_token = new_token
                         break
