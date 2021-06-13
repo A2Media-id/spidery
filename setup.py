@@ -162,6 +162,7 @@ setup(
     # # installed, specify them here.
     package_data={  # Optional
         'spidery': [],
+        'spidery.ocr': ['*.bin', ],
         'spidery.ua': ['*.bin', ],
         'spidery.spider.osint': ['*.bin', ],
     },
