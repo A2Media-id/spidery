@@ -3,6 +3,7 @@
 import glob
 import importlib
 import ipaddress
+import json
 import logging
 import os
 import pickle
@@ -47,10 +48,6 @@ class BaseCrawl(object):
         'sec-fetch-site': 'cross-site',
         'sec-fetch-mode': 'navigate',
         'sec-fetch-user': '?1',
-        'cache-ttl': '10',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Microsoft Edge";v="90"',
-        'accept-language': 'en-US,en;q=0.9,id;q=0.8',
     })
     _session = requests.session()
     _proxies = None
@@ -105,12 +102,28 @@ class BaseCrawl(object):
                     ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
             return None
 
-    def get_soup(self, url, params=None, headers=None, timeout=10):
+    def get_json(self, url, params=None, headers=None, timeout=10):
+        """Encapsulate the get request method and disable SSL verification"""
+        headers = headers or self.headers
+        try:
+            return self.request(url=url, method='GET', params=params, extra_headers=headers, timeout=timeout).json()
+        except ValueError:
+            return None
+        except requests.exceptions.ProxyError:
+            return None
+        except requests.RequestException as error:
+            print(error)
+            if self._debug:
+                logging.exception(
+                    ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__)))
+            return None
+
+    def get_soup(self, url, params=None, headers=None, parser="html.parser", timeout=10):
         """Encapsulate the get request method and disable SSL verification"""
         headers = headers or self.headers
         try:
             req = self.request(url=url, method='GET', params=params, extra_headers=headers, timeout=timeout)
-            return BeautifulSoup(req.text, "html.parser")
+            return BeautifulSoup(req.text, parser)
         except requests.exceptions.ProxyError:
             return None
         except requests.RequestException as error:
