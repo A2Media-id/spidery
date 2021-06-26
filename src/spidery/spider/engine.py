@@ -122,8 +122,9 @@ class BaseCrawl(object):
         """Encapsulate the get request method and disable SSL verification"""
         headers = headers or self.headers
         try:
-            req = self.request(url=url, method='GET', params=params, extra_headers=headers, timeout=timeout)
-            return BeautifulSoup(req.text, parser)
+            response = self.request(url=url, method='GET', params=params, extra_headers=headers, timeout=timeout)
+            response.encoding = 'utf-8'
+            return BeautifulSoup(response.text, parser)
         except requests.exceptions.ProxyError:
             return None
         except requests.RequestException as error:
